@@ -19,7 +19,8 @@ export PATH="$(pwd):$PATH"
 #or:brew install sratoolkit
 ```
 ## fastqc
-```wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.12.1.zip
+```
+wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.12.1.zip
 uzip fastqc_v0.12.1.zip
 
 #brew install fastqc
