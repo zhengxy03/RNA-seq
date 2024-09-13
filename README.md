@@ -5,6 +5,13 @@ cd project/rat
 mkdir annotation genome sequence output script
 ```
 # 2 install tools
+basic workfolw:
+* download
+* uncompress
+* change dir
+* config
+* make
+* export PATH
 ## 2.1 sra
 download and convert data
 ```cd ~/biosoft
@@ -46,6 +53,19 @@ wget http://www.di.fc.ul.pt/~afalcao/hisat2.1/hisat2.1_Windows.zip
 ```
 ## 2.7 sortmerna
 
+## 2.8 samtools
+```wget -c https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2
+cd samtools-1.21
+./configure --prefix=$(pwd)
+make -j 4
+export PATH="$(pwd):PATH"
 ```
-wget https://github.com/biocore/sortmerna/archive/2.1.tar.gz -O sortmerna-2.1.tar.gz
+# 2.9 HTseq
+```pip install -i https://pypi.tuna.tsinghua.edu.cn/simple HTseq
 ```
+# 2.10 parallel
+```brew install parallel
+```
+# 2.11 StringTie
+# 2.12 Ballgown
+
