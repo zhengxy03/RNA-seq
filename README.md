@@ -33,10 +33,12 @@ unzip fastqc_v0.12.1.zip
 #brew install fastqc
 ```
 ## 2.3 multiqc
-```pip install multiqc
+```
+pip install multiqc
 ```
 ## 2.4 cutadapt
-```pip install cutadapt
+```
+pip install cutadapt
 ```
 ## 2.5 quality control and trim adapter
 * Trim Galore
@@ -54,17 +56,20 @@ wget http://www.di.fc.ul.pt/~afalcao/hisat2.1/hisat2.1_Windows.zip
 ## 2.7 sortmerna
 
 ## 2.8 samtools
-```wget -c https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2
+```
+wget -c https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2
 cd samtools-1.21
 ./configure --prefix=$(pwd)
 make -j 4
 export PATH="$(pwd):PATH"
 ```
 ## 2.9 HTseq
-```pip install -i https://pypi.tuna.tsinghua.edu.cn/simple HTseq
+```
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple HTseq
 ```
 ## 2.10 parallel
-```brew install parallel
+```
+brew install parallel
 ```
 ## 2.11 StringTie
 ## 2.12 Ballgown
