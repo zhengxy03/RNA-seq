@@ -60,12 +60,12 @@ cd samtools-1.21
 make -j 4
 export PATH="$(pwd):PATH"
 ```
-# 2.9 HTseq
+## 2.9 HTseq
 ```pip install -i https://pypi.tuna.tsinghua.edu.cn/simple HTseq
 ```
-# 2.10 parallel
+## 2.10 parallel
 ```brew install parallel
 ```
-# 2.11 StringTie
-# 2.12 Ballgown
+## 2.11 StringTie
+## 2.12 Ballgown
 
