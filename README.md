@@ -72,6 +72,21 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple HTseq
 brew install parallel
 ```
 ## 2.11 StringTie
+```
+wget http://ccb.jhu.edu/software/stringtie/dl/stringtie-2.2.3.tar.gz
+```
 ## 2.12 Ballgown
+```
+wget https://bioconductor.org/packages/release/bioc/bin/windows/contrib/4.4/ballgown_2.36.0.zip
+```
 # 3 data download
-
+* download from Ensembl
+```
+wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
+```
+* uncompress
+* rename
+* check(chr...)
+* clear some additional text
+```
+cat rn6.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn6.fa
