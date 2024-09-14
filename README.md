@@ -53,7 +53,7 @@ wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-
 ```
 wget http://www.di.fc.ul.pt/~afalcao/hisat2.1/hisat2.1_Windows.zip
 ```
-## 2.7 sortmerna
+## 2.7 sortmerna[optional]
 
 ## 2.8 samtools
 ```
@@ -71,15 +71,17 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple HTseq
 ```
 brew install parallel
 ```
-## 2.11 StringTie
+## 2.11 StringTie[optional]
 ```
 wget http://ccb.jhu.edu/software/stringtie/dl/stringtie-2.2.3.tar.gz
 ```
-## 2.12 Ballgown
+## 2.12 Ballgown[optional]
 ```
 wget https://bioconductor.org/packages/release/bioc/bin/windows/contrib/4.4/ballgown_2.36.0.zip
 ```
 # 3 data download
+## 3.1 ref data
+### 3.1.1 genomes data
 * download from Ensembl
 ```
 wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
@@ -90,3 +92,14 @@ wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_
 * clear some additional text
 ```
 cat rn6.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn6.fa
+```
+* count chr lengths
+
+### 3.1.2 Genome Index File[optional]
+
+### 3.1.3 annotation
+
+### 3.1.4 gff file
+
+## 3.2 Experimental Data
+
