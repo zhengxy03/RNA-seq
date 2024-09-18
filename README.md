@@ -114,5 +114,15 @@ parallel -j 4 "
 rm *.sra
 ```
 # 4 quality control
-fastqc [选项][测序文件]
+## 4.1 quality assessment
+* fastqc [选项][测序文件]
+```
+fastqc -t 6 -o ../output/fastqc *.gz
+```
+* multiqc
+    ** per seq GC content
+    ** seq quality histograms(phred score < 30)
+    ** count numbers of per seq quality scores
+    ** adapter content
+## 4.2 cut adapter and low quality bases
 
