@@ -7,7 +7,7 @@ mkdir annotation genome sequence output script
 # 2 install tools
 basic workfolw:
 * download
-* uncompress
+* decompress
 * change dir
 * config
 * make
@@ -81,12 +81,12 @@ wget https://bioconductor.org/packages/release/bioc/bin/windows/contrib/4.4/ball
 ```
 # 3 data download
 ## 3.1 ref data
-### 3.1.1 genomes data
+### 3.1.1 genomes data(.fasta)
 * download from Ensembl
 ```
 wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
 ```
-* uncompress
+* decompress
 * rename
 * check(chr...)
 * clear some additional text
@@ -96,10 +96,23 @@ cat rn6.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' >
 * count chr lengths
 
 ### 3.1.2 Genome Index File[optional]
+* hisat2
+### 3.1.3 annotation(.gff)
 
-### 3.1.3 annotation
-
-### 3.1.4 gff file
-
-## 3.2 Experimental Data
+## 3.2 Experimental Data(.sra)
+* NCBI-GEO >> GEO accession
+* SRA Run Selector
+* download
+```
+nohup prefetch SRR2190795 SRR224018{2..7} SRR2240228 -o . &
+```
+* convert format(.sar > .fastq > .gz)
+```
+parallel -j 4 "
+    fastq-dump --split-3 --gzip {1}
+" ::: $(ls *.sra)
+rm *.sra
+```
+# 4 quality control
+fastqc [选项][测序文件]
 
