@@ -304,3 +304,4 @@ cd HTseq
 cat SRR2190795.count | head -n 10
 ```
 # 8 
+## 8.1 merge
