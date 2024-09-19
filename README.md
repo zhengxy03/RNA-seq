@@ -5,6 +5,7 @@ cd project/rat
 mkdir annotation genome sequence output script
 ```
 # 2 install tools
+cd ~/biosoft
 basic workfolw:
 * download
 * decompress
@@ -29,6 +30,8 @@ export PATH="$(pwd):$PATH"
 ```
 wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.12.1.zip
 unzip fastqc_v0.12.1.zip
+cd FastQC
+export PATH="$(pwd):$PATH"
 
 #brew install fastqc
 ```
@@ -44,17 +47,37 @@ pip install cutadapt
 * Trim Galore
 ```
 wget https://github.com/FelixKrueger/TrimGalore/archive/0.6.3.tar.gz -O TrimGalore.gz
+gzip -d TrimGalore.gz
 ```
-*trimmomatic
+* fastp
+* trimmomatic
 ```
 wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.38.zip
+unzip Trimmomatic-0.38.zip
+
+cd Trimmomatic-0.38
+export PATH="$(pwd):$PATH"
 ```
 ## 2.6 hisat2
 ```
 wget http://www.di.fc.ul.pt/~afalcao/hisat2.1/hisat2.1_Windows.zip
+unzip hisat2.1_Windows.zip
+
+cd hisat2.1
+export PATH="$(pwd):$PATH"
 ```
 ## 2.7 sortmerna[optional]
+```
+wget https://github.com/sortmerna/sortmerna/releases/download/v4.3.7/sortmerna-4.3.7-win64.7z -O sortmerna-4.3.7.7z
+7z x sortmerna-4.3.7.7z
+cd sortmerna-4.3.7
 
+./configure --prefix=$PWD
+make -j 4
+./sortmerna --help
+export PATH="$(pwd):$PATH"
+mv ./rRNA_databases/ ~/database/sortmerna_db/rRNA_databases
+```
 ## 2.8 samtools
 ```
 wget -c https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2
@@ -114,15 +137,51 @@ parallel -j 4 "
 rm *.sra
 ```
 # 4 quality control
+cd ~/project/rat/output
 ## 4.1 quality assessment
 * fastqc [选项][测序文件]
 ```
+mkdir -p ../output/fastqc
 fastqc -t 6 -o ../output/fastqc *.gz
+
+cd ../output/fastqc
+ls
 ```
 * multiqc
     ** per seq GC content
+    ```
+    cd ../output/fastqc
+    multiqc .
+    ```
     ** seq quality histograms(phred score < 30)
     ** count numbers of per seq quality scores
     ** adapter content
 ## 4.2 cut adapter and low quality bases
+```
+mkdir -p ../output/adapter
+for i in $(ls *.fastq.gz);
+do
+    cutadapt -a AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT --minimum-length 30 --overlap 4 --trim-n \
+    -o ../output/adapter/${i} ${i}
+done
+```
+## 4.3 trim low quality regions again
+```
+cd  ~/project/rat/output/adapter/
+mkdir ../trim
+
+parallel -j 4 "
+    java -jar ~/biosoft/Trimmomatic-0.38/trimmomatic-0.38.jar SE -phred33 {1} ../trim/{1} \
+    LEADING:20 TRAILING:20 SLIDINGWINDOW:5:15 MINLEN:30 \
+" ::: $(ls *.gz)
+```
+## 4.4 quality assessment again
+```
+mkdir ~/project/rat/output/fastqc_trim
+parallel -j 4 "
+    fastqc -t 4 -o ../fastqc_trim {1}
+" ::: $(ls *.gz)
+cd ../fastqc_trim
+multiqc .
+```
 
