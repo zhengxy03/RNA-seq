@@ -111,13 +111,49 @@ wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_
 ```
 * decompress
 * rename
+```
+mv Rattus_norvegicus.Rnor_6.0.dna.toplevel.fa rn6.raw.fa
+```
 * check(chr...)
 * clear some additional text
 ```
 cat rn6.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn6.fa
+rm rn6.raw.fa
 ```
-* count chr lengths
-
+* count per chr lengths
+```
+cat rn6.fa | perl -n -e '
+    s/\r?\n//;
+    if(m/^>(.+?)\s*$/){
+        $title = $1;
+        push @t, $title;
+    }elsif(defined $title){
+        $title_len{$title} += length($_);
+    }
+    END{
+        for my $title (@t){
+            print "$title","\t","$title_len{$title}","\n";
+        }
+    }
+'
+```
+chr1:
+```
+cat rn6.fa | perl -n -e '
+  if(m/^>/){
+    if(m/>1$/){
+      $title = 1;
+    }else{
+      $title = 0;
+    }
+  }else{
+    push @s, $_ if $title;
+  }
+  END{
+    printf ">1\n%s", join("", @s);
+  }
+' > rn6.chr1.fa
+```
 ### 3.1.2 Genome Index File[optional]
 * hisat2
 ### 3.1.3 annotation(.gff)
@@ -184,11 +220,43 @@ parallel -j 4 "
 cd ../fastqc_trim
 multiqc .
 ```
-# 5 rm rRNA
+# 5 rm rRNA[optional]
 
 # 6 seq alignment
 hisat2
+## 6.1 build index(.ht2)
 ```
 hisat2-build [选项] [基因组序列(.fa)] [索引文件的前缀名]
+
+cd ~/project/rat/genome
+mkdir index
+cd index
+
+hisat2-build -p 6 ../rn6.chr1.fa rn6.chr1
+```
+## 6.2 alignment
+```
+hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成对测序文件 ] [ -S 输出的sam文件 ]
+
+cd ~/project/rat/output
+mkdir align
+cd rRNA
+parallel -k -j 4 "
+    hisat2 -t -x ../../genome/index/rn6.chr1 \ 
+    -U {1}.fq.gz -S ../align/{1}.sam \ 
+    2>../align/{1}.log
+" ::: $(ls *.gz | perl -p -e 's/.fq.gz$//')
+
+cat SRR2190795.log
+```
+* summarize align rate and time
+```
+cd ~/project/rat/output/align
+file_list=($(ls *.log))
+
+echo -e "sample\tratio\ttime"
+for i in ${file_list[@]};
+do
+    prefix=$(echo ${i} | perl -p -e 's/\.log//')
 
 
