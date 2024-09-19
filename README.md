@@ -184,4 +184,11 @@ parallel -j 4 "
 cd ../fastqc_trim
 multiqc .
 ```
+# 5 rm rRNA
+
+# 6 seq alignment
+hisat2
+```
+hisat2-build [选项] [基因组序列(.fa)] [索引文件的前缀名]
+
 
