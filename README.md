@@ -234,7 +234,8 @@ cd index
 
 hisat2-build -p 6 ../rn6.chr1.fa rn6.chr1
 ```
-## 6.2 alignment
+## 6.2 alignment(.sam)
+cd ~/project/rat/output/align
 ```
 hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成对测序文件 ] [ -S 输出的sam文件 ]
 
@@ -249,14 +250,41 @@ parallel -k -j 4 "
 
 cat SRR2190795.log
 ```
-* summarize align rate and time
+* summarize alignment rate and time
 ```
-cd ~/project/rat/output/align
 file_list=($(ls *.log))
 
 echo -e "sample\tratio\ttime"
 for i in ${file_list[@]};
 do
     prefix=$(echo ${i} | perl -p -e 's/\.log//')
-
-
+    echo -n -e "${prefix}\t"
+    cat ${i} | 
+        grep -E "(overall alignment rate)|(Overall time)" |
+        perl -n -e '
+            if(m/alignment/){
+                $hash{precent} = $1 if m/([\d.]+)%/;
+            }elseif(m/time/){
+                if(m/(\d\d):(\d\d):(\d\d)/){
+                    my $time = $1 * 60 + $2 + $3 / 60;
+                    $hash{time} = $time;
+                }
+            }
+            END{
+                $hash{precent} = "NA" if not exists $hash{precent};
+                $hash{time} = "NA" if not exists $hash{time};
+                printf "%.2f\t%.2f\n", $hash{precent}, $hash{time};
+            }
+        '          
+done
+```
+* convert format and sort(.bam)
+samtools
+```
+parallel -k -j 4 "
+    samtools sort -@ 4 {1}.sam > {1}.sort.bam
+    samtools index {1}.sort.bam
+" ::: $(ls *.sam | perl -p -e 's/\.sam$//')
+rm *.sam
+ls
+```
