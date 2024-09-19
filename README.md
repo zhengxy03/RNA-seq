@@ -288,3 +288,19 @@ parallel -k -j 4 "
 rm *.sam
 ls
 ```
+# 7 expression level
+cd ~/project/rat/output 
+```
+htseq-count [options] <alignment_files> <gff_file>
+
+mkdir HTseq
+cd align
+parallel -j 4 "
+    htseq-count -s no -f bam {1}.sort.bam ../../annotation/rn6.gff \ 
+      >../HTseq/{1}.count 2>../HTseq/{1}.log
+" ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
+
+cd HTseq
+cat SRR2190795.count | head -n 10
+```
+# 8 
