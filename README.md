@@ -234,7 +234,7 @@ cd index
 
 hisat2-build -p 6 ../rn6.chr1.fa rn6.chr1
 ```
-## 6.2 alignment(.sam)
+## 6.2 alignment(.sam--.bam)
 cd ~/project/rat/output/align
 ```
 hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成对测序文件 ] [ -S 输出的sam文件 ]
@@ -332,4 +332,25 @@ for(i in seq(2, length(id_list))){
 
 write.csv(data_merge, "merge.csv", quote = FALSE, row.names = FALSE)
 ```
-## 8.2 Data Normalization
+## 8.2 read counts Normalization
+calculate
+* gene length
+```
+library(GenomicFeatures)
+# Granges对象
+txdb <- makeTxDbFromGFF("rn6.gff")
+# exon
+exons_gene <- exonsBy(txdb, by = "gene")
+# full length
+gene_len <- list()
+for(i in names(exons_gene)){
+  range_info = reduce(exons_gene[[i]])
+  width_info = width(range_info)
+  sum_len = sum(width_info)
+  gene_len[[i]] = sum_len
+}
+# gene_len <- lapply(exons_gene,function(x){sum(width(reduce(x)))})
+
+data <- t(as.data.frame(gene_len))
+#outfile
+write.table(data, file = "rn6_gene_len.tsv", row.names =TRUE, sep = "\t", quote = FALSE, col.names = FALSE)
