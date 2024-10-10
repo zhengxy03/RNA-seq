@@ -1,3 +1,4 @@
+# RNA-seq workflow
 # 1 mkdir
 ```mkdir biosoft
 mkdir -p project/rat
