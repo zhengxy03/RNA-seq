@@ -159,39 +159,39 @@ cat rn6.fa | perl -n -e '
 ### 3.1.3 annotation(.gff)
 
 ## 3.2 Experimental Data(.sra)
+cd ~/project/rat/sequence
 * NCBI-GEO >> GEO accession
 * SRA Run Selector
 * download
 ```
-nohup prefetch SRR2190795 SRR224018{2..7} SRR2240228 -o . &
+nohup prefetch SRR2190795 SRR224018{2..7} SRR2240228 -O . &
 ```
 * convert format(.sar > .fastq > .gz)
 ```
-parallel -j 4 "
-    fastq-dump --split-3 --gzip {1}
-" ::: $(ls *.sra)
-rm *.sra
+
+
+
+
 ```
 # 4 quality control
 cd ~/project/rat/output
 ## 4.1 quality assessment
 * fastqc [选项][测序文件]
 ```
-mkdir -p ../output/fastqc
-fastqc -t 6 -o ../output/fastqc *.gz
 
-cd ../output/fastqc
-ls
+
+
 ```
 * multiqc
-    ** per seq GC content
-    ```
-    cd ../output/fastqc
-    multiqc .
-    ```
-    ** seq quality histograms(phred score < 30)
-    ** count numbers of per seq quality scores
-    ** adapter content
+  * per seq GC content
+  ```
+
+
+.
+  ```
+  * seq quality histograms(phred score < 30)
+  * count numbers of per seq quality scores
+  * adapter content
 ## 4.2 cut adapter and low quality bases
 ```
 mkdir -p ../output/adapter
