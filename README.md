@@ -1,3 +1,4 @@
+# RNA-seq workflow
 # 1 mkdir
 ```mkdir biosoft
 mkdir -p project/rat
@@ -112,34 +113,34 @@ wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_
 * decompress
 * rename
 ```
-mv Rattus_norvegicus.Rnor_6.0.dna.toplevel.fa rn6.raw.fa
+mv Rattus_norvegicus.Rnor_7.2.dna.toplevel.fa rn7.raw.fa
 ```
 * check(chr...)
 * clear some additional text
 ```
-cat rn6.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn6.fa
-rm rn6.raw.fa
+cat rn7.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn6.fa
+rm rn7.raw.fa
 ```
 * count per chr lengths
 ```
-cat rn6.fa | perl -n -e '
-    s/\r?\n//;
-    if(m/^>(.+?)\s*$/){
-        $title = $1;
-        push @t, $title;
-    }elsif(defined $title){
-        $title_len{$title} += length($_);
+cat rn7.fa | perl -n -e '
+  s/\r?\n//;
+  if(m/^>(.+?)\s*$/){
+    $title = $1;
+    push @t, $title;
+  }elsif(defined $title){
+    $title_len{$title} += length($_);
+  }
+  END{
+    for my $title (@t){
+      print "$title","\t","$title_len{$title}","\n";
     }
-    END{
-        for my $title (@t){
-            print "$title","\t","$title_len{$title}","\n";
-        }
-    }
+  }
 '
 ```
 chr1:
 ```
-cat rn6.fa | perl -n -e '
+cat rn7.fa | perl -n -e '
   if(m/^>/){
     if(m/>1$/){
       $title = 1;
@@ -152,11 +153,21 @@ cat rn6.fa | perl -n -e '
   END{
     printf ">1\n%s", join("", @s);
   }
-' > rn6.chr1.fa
+' > rn7.chr1.fa
 ```
 ### 3.1.2 Genome Index File[optional]
 * hisat2
+```
+wget https://genome-idx.s3.amazonaws.com/hisat/rn6_genome.tar.gz
+gzip -d rn6_genome.tar.gz
+```
 ### 3.1.3 annotation(.gff)
+cd ~/project/rat/annotation
+wget https://ftp.ensembl.org/pub/release-112/gff3/rattus_norvegicus/Rattus_norvegicus.mRatBN7.2.112.gff3.gz
+gzip -d Rattus_norvegicus.mRatBN7.2.112.gff3.gz
+mv Rattus_norvegicus.mRatBN7.2.112.gff3 rn7.gff
+head rn7.gff
+```
 
 ## 3.2 Experimental Data(.sra)
 cd ~/project/rat/sequence
