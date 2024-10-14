@@ -192,6 +192,7 @@ parallel -j 4 "
 " ::: $(ls *.sra)
 
 rm *.sra
+
 gzip -d -c  | head -n 20
 ```
 # 4 quality control
