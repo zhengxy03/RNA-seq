@@ -69,14 +69,15 @@ export PATH="$(pwd):$PATH"
 ```
 ## 2.7 sortmerna[optional]
 ```
-wget https://github.com/sortmerna/sortmerna/releases/download/v4.3.7/sortmerna-4.3.7-win64.7z -O sortmerna-4.3.7.7z
-7z x sortmerna-4.3.7.7z
+wget https://github.com/sortmerna/sortmerna/releases/download/v4.3.7/sortmerna-4.3.7-Linux.tar.gz -O sortmerna-4.3.7.tar.gz
+tar -xvzf sortmerna-4.3.7.tar.gz
 cd sortmerna-4.3.7
 
-./configure --prefix=$PWD
-make -j 4
+echo 'export PATH=~/biosoft/sortmerna-4.3.7:$PATH' >> ~/.bash_profile
+source ~/.bash_profile
+
 ./sortmerna --help
-export PATH="$(pwd):$PATH"
+
 mv ./rRNA_databases/ ~/database/sortmerna_db/rRNA_databases
 ```
 ## 2.8 samtools
@@ -275,7 +276,7 @@ parallel -j 4 "
   # --log    : 生成日志文件
   # -a       : 线程数
   # -v       : 吵闹模式
-  
+
 ```
 # 6 seq alignment
 hisat2
