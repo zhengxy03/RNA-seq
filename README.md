@@ -196,8 +196,10 @@ rm *.sra
 gzip -d -c SRR2190795.fastq.gz | head -n 20
 ```
 # 4 quality control
+cd ~/project/rat/output
 ## 4.1 quality assessment(fastqc)
-cd ~/project/rat/output/fastqc
+input:sequence (.fastq.gz)
+output:fastqc (fastqc.html;fastqc.zip)
 * fastqc [选项][测序文件]
 ```
 cd ~/project/rat/sequence
@@ -219,7 +221,8 @@ multiqc .
   * count numbers of per seq quality scores
   * adapter content
 ## 4.2 cut adapter and low quality bases(trimmomatic)
-cd ~/project/rat/output/adapter
+input:sequence (.fastq.gz)
+output:adapter (.fastq.gz)
 ```
 mkdir -p ../output/adapter
 
@@ -231,7 +234,8 @@ for i in $(ls *.fastq.gz); do
 done
 ```
 ## 4.3 trim low quality regions(trimmomatic)
-cd  ~/project/rat/output/trim
+input adapter (.fastq.gz)
+output:trim (.fastq.gz)
 ```
 mkdir ../trim
 
@@ -242,18 +246,37 @@ parallel -j 4 "
 " ::: $(ls *.gz)
 ```
 ## 4.4 quality assessment again(fastqc)
-cd ~/project/rat/output/fastqc_trim
+input:trim (.fastq.gz)
+output:fastqc_trim (fastqc.html;fastqc.zip)
 ```
 mkdir ~/project/rat/output/fastqc_trim
 parallel -j 4 "
-  fastqc -t 6 -o ../fastqc_trim
+  fastqc -t 4 -o ../fastqc_trim {1}
 " ::: $(ls *.gz)
 
 cd ../fastqc_trim
 multiqc .
 ```
 # 5 rm rRNA[optional]
+cd ~/project/rat/output/rRNA
+input:trim (.fastq.gz > .fastq)
+```
+mkdir -p ~/project/rat/output/rRNA/discard
 
+cd trim
+parallel -j 4 "
+  gzip -d {1}*.fq.gz
+
+  # euk_rNRA_ref_data就是之前安装sortmerna的时候定义的数据库文件
+  # --reads  : 测序文件
+  # --aligned: 与rRNA数据库能比对上的序列(后续不需要的)
+  # --other  : 与rRNA数据库不能比对上的序列(后续需要的)
+  # --fastx  : 输出fastq文件
+  # --log    : 生成日志文件
+  # -a       : 线程数
+  # -v       : 吵闹模式
+  
+```
 # 6 seq alignment
 hisat2
 ## 6.1 build index(.ht2)
