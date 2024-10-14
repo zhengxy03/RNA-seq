@@ -184,24 +184,23 @@ array=(SRR2190795 SRR224018{2..7} SRR2240228)
 for i in "${array[@]}"; do
   dir="$HOME/project/rat/sequence/$i"
   cd "${dir}"
-  mv ${dir}/* $HOME/project/rat/sequence
+  mv ${dir}/* $HOME/project/rat/sequence/srr
 done
 
-array=(SRR2190795 SRR224018{2..7} SRR2240228)
-for i in "${array[@]}"; do
-  cd "$HOME/project/rat/sequence/$i"
-  parallel -j 4 "
-    fastq-dump --split-3 --gzip {1} -O .
-  " ::: ${i}.sra
-  cd ..
-done
+parallel -j 4 "
+    fastq-dump --split-3 --gzip {1}
+" ::: $(ls *.sra)
+
+rm *.sra
+gzip -d -c  | head -n 20
 ```
 # 4 quality control
 cd ~/project/rat/output
 ## 4.1 quality assessment
 * fastqc [选项][测序文件]
 ```
-
+mkdir fastqc
+fastqc -t 6 -o ./fastqc *gz
 
 
 ```
