@@ -53,10 +53,10 @@ gzip -d TrimGalore.gz
 * fastp
 * trimmomatic
 ```
-wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.38.zip
-unzip Trimmomatic-0.38.zip
+wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip
+unzip Trimmomatic-0.39.zip
 
-cd Trimmomatic-0.38
+cd Trimmomatic-0.39
 export PATH="$(pwd):$PATH"
 ```
 ## 2.6 hisat2
@@ -188,58 +188,67 @@ for i in "${array[@]}"; do
 done
 
 parallel -j 4 "
-    fastq-dump --split-3 --gzip {1}
+  fastq-dump --split-3 --gzip {1}
 " ::: $(ls *.sra)
 
 rm *.sra
 
-gzip -d -c  | head -n 20
+gzip -d -c SRR2190795.fastq.gz | head -n 20
 ```
 # 4 quality control
-cd ~/project/rat/output
-## 4.1 quality assessment
+## 4.1 quality assessment(fastqc)
+cd ~/project/rat/output/fastqc
 * fastqc [选项][测序文件]
 ```
-mkdir fastqc
-fastqc -t 6 -o ./fastqc *gz
+cd ~/project/rat/sequence
+mkdir ../output/fastqc
+# -o 指定输出文件夹
+# *.gz 表示这个目录下以 .gz 的所有文件
+fastqc -t 6 -o ../output/fastqc *gz
 
-
+cd ~/project/rat/output/fastqc
+ls
 ```
 * multiqc
   * per seq GC content
-  ```
-
-
-.
-  ```
+```
+multiqc .
+```
+解读：https://www.jianshu.com/p/db2100baabb5
   * seq quality histograms(phred score < 30)
   * count numbers of per seq quality scores
   * adapter content
-## 4.2 cut adapter and low quality bases
+## 4.2 cut adapter and low quality bases(trimmomatic)
+cd ~/project/rat/output/adapter
 ```
 mkdir -p ../output/adapter
-for i in $(ls *.fastq.gz);
-do
-    cutadapt -a AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT --minimum-length 30 --overlap 4 --trim-n \
-    -o ../output/adapter/${i} ${i}
+
+cd ~/project/rat/sequence
+for i in $(ls *.fastq.gz); do
+  cutadapt -a AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT \
+  --minimum-length 30 --overlap 4 --trim-n \
+  -o ../output/adapter/${i} ${i}
 done
 ```
-## 4.3 trim low quality regions again
+## 4.3 trim low quality regions(trimmomatic)
+cd  ~/project/rat/output/trim
 ```
-cd  ~/project/rat/output/adapter/
 mkdir ../trim
 
 parallel -j 4 "
-    java -jar ~/biosoft/Trimmomatic-0.38/trimmomatic-0.38.jar SE -phred33 {1} ../trim/{1} \
-    LEADING:20 TRAILING:20 SLIDINGWINDOW:5:15 MINLEN:30 \
+  java -jar ~/biosoft/Trimmomatic-0.39/trimmomatic-0.39.jar \
+  SE -phred33 {1} ../trim/{1} \
+  LEADING:20 TRAILING:20 SLIDINGWINDOW:5:15 MINLEN:30 \
 " ::: $(ls *.gz)
 ```
-## 4.4 quality assessment again
+## 4.4 quality assessment again(fastqc)
+cd ~/project/rat/output/fastqc_trim
 ```
 mkdir ~/project/rat/output/fastqc_trim
 parallel -j 4 "
-    fastqc -t 4 -o ../fastqc_trim {1}
+  fastqc -t 6 -o ../fastqc_trim
 " ::: $(ls *.gz)
+
 cd ../fastqc_trim
 multiqc .
 ```
