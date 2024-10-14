@@ -162,6 +162,7 @@ wget https://genome-idx.s3.amazonaws.com/hisat/rn6_genome.tar.gz
 gzip -d rn6_genome.tar.gz
 ```
 ### 3.1.3 annotation(.gff)
+```
 cd ~/project/rat/annotation
 wget https://ftp.ensembl.org/pub/release-112/gff3/rattus_norvegicus/Rattus_norvegicus.mRatBN7.2.112.gff3.gz
 gzip -d Rattus_norvegicus.mRatBN7.2.112.gff3.gz
@@ -179,10 +180,21 @@ nohup prefetch SRR2190795 SRR224018{2..7} SRR2240228 -O . &
 ```
 * convert format(.sar > .fastq > .gz)
 ```
+array=(SRR2190795 SRR224018{2..7} SRR2240228)
+for i in "${array[@]}"; do
+  dir="$HOME/project/rat/sequence/$i"
+  cd "${dir}"
+  mv ${dir}/* $HOME/project/rat/sequence
+done
 
-
-
-
+array=(SRR2190795 SRR224018{2..7} SRR2240228)
+for i in "${array[@]}"; do
+  cd "$HOME/project/rat/sequence/$i"
+  parallel -j 4 "
+    fastq-dump --split-3 --gzip {1} -O .
+  " ::: ${i}.sra
+  cd ..
+done
 ```
 # 4 quality control
 cd ~/project/rat/output
