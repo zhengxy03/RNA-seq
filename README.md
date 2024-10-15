@@ -324,14 +324,36 @@ hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成�
 
 cd ~/project/rat/output
 mkdir align
-cd rRNA
+cd trim
 parallel -k -j 4 "
   hisat2 -t -x ../../genome/index/rn7.chr1 \
-  -U {1}.fa.gz -S ../align/{1}.sam \
+  -U {1}.fastq.gz -S ../align/{1}.sam \
   2>../align/{1}.log
 " ::: $(ls *.gz | perl -p -e 's/.fastq.gz$//')
 
+cd ../align
 cat SRR2190795.log
 ```
 * summarize alignment rate and time
 ```
+file_list=$(ls *.log)
+for i in ${file_list[@]};
+do
+  cat ${i} |
+    grep -E "(overall alignment rate)|(Overall time)" |
+    perl -n -e '
+      if(m/alignment/){
+        $hash{precent}=$1 if m/([\d.]+)%/;
+      }elsif(m/time/){
+        if(m/(\d\d):(\d\d):(\d\d)/){
+          my $time = $1 * 60 + $2 + $3 / 60;
+          $hash{time} = $time;
+        }
+      }
+      END{
+        $hash{precent} = "NA" if not exists $hash{precent};
+        $hash{time} = "NA" if not exists $hash{time};
+        printf "%.2f\t%.2f\n", $hash{precent}, $hash{time};
+      }
+    '
+done
