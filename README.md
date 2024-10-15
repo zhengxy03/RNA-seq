@@ -66,6 +66,8 @@ unzip hisat2.1_Windows.zip
 
 cd hisat2.1
 export PATH="$(pwd):$PATH"
+source ~/.bashrc
+hisat2 -h
 ```
 ## 2.7 sortmerna[optional]
 ```
@@ -76,9 +78,17 @@ cd sortmerna-4.3.7
 echo 'export PATH=~/biosoft/sortmerna-4.3.7:$PATH' >> ~/.bash_profile
 source ~/.bash_profile
 
-./sortmerna --help
+sortmerna -h
 
-mv ./rRNA_databases/ ~/database/sortmerna_db/rRNA_databases
+wget https://github.com/biocore/sortmerna/releases/download/v4.3.4/database.tar.gz
+tar -xvzf database.tar.gz
+mkdir -p ~/database/sortmerna_db/rRNA_databases
+mv ./*.fasta ~/database/sortmerna_db/rRNA_databases
+
+cd ~/database/sortmerna_db
+#sortmerna_ref_data=$(pwd)/rRNA_databases/smr_v4.3_default_db.fasta
+
+
 ```
 ## 2.8 samtools
 ```
@@ -276,11 +286,28 @@ parallel -j 4 "
   # --log    : 生成日志文件
   # -a       : 线程数
   # -v       : 吵闹模式
+  
+  # 注意--aligned和--other后接文件名前缀，不用在加什么 .fq 或者 .fastq之类的，否则将会生成 xxx.fq.fq
+  sortmerna \
+  sortmerna \
+    --ref $euk_rNRA_ref_data \
+    --reads {1}.fastq \
+    --aligned ../rRNA/discard/{1} \
+    --other ../rRNA/{1} \
+    --fastx \
+    --log \
+    -a 4 \
+    -v 
 
+    gzip ../rRNA/discard/{1}.fastq
+    gzip ../rRNA/{1}.fastq
+" ::: $(ls *.fastq.gz | perl -n -e 'print $1. "\n" if m/(.+?)_/')
 ```
 # 6 seq alignment
 hisat2
 ## 6.1 build index(.ht2)
+input:genome (.fa)
+output:index (.ht2)
 ```
 hisat2-build [选项] [基因组序列(.fa)] [索引文件的前缀名]
 
@@ -288,7 +315,7 @@ cd ~/project/rat/genome
 mkdir index
 cd index
 
-hisat2-build -p 6 ../rn6.chr1.fa rn6.chr1
+hisat2-build -p 6 ../rn7.chr1.fa rn7.chr1
 ```
 ## 6.2 alignment(.sam--.bam)
 cd ~/project/rat/output/align
@@ -299,9 +326,9 @@ cd ~/project/rat/output
 mkdir align
 cd rRNA
 parallel -k -j 4 "
-    hisat2 -t -x ../../genome/index/rn6.chr1 \ 
-    -U {1}.fq.gz -S ../align/{1}.sam \ 
-    2>../align/{1}.log
+  hisat2 -t -c ../../genome/index/rn7.chr1 \
+  -U {1}.fa.gz -S ../align/{1}.sam \
+  2>../align/{1}.log
 " ::: $(ls *.gz | perl -p -e 's/.fq.gz$//')
 
 cat SRR2190795.log
