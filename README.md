@@ -339,6 +339,8 @@ cat SRR2190795.log
 file_list=$(ls *.log)
 for i in ${file_list[@]};
 do
+  perfix = $(echo {i} | perl -p -e 's/\.log//')
+  echo -n -e '${perfix}\t'
   cat ${i} |
     grep -E "(overall alignment rate)|(Overall time)" |
     perl -n -e '
