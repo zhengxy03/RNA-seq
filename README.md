@@ -326,10 +326,10 @@ cd ~/project/rat/output
 mkdir align
 cd rRNA
 parallel -k -j 4 "
-  hisat2 -t -c ../../genome/index/rn7.chr1 \
+  hisat2 -t -x ../../genome/index/rn7.chr1 \
   -U {1}.fa.gz -S ../align/{1}.sam \
   2>../align/{1}.log
-" ::: $(ls *.gz | perl -p -e 's/.fq.gz$//')
+" ::: $(ls *.gz | perl -p -e 's/.fastq.gz$//')
 
 cat SRR2190795.log
 ```
