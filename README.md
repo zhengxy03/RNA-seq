@@ -207,7 +207,7 @@ rm *.sra
 
 gzip -d -c SRR2190795.fastq.gz | head -n 20
 ```
-# 4 quality control
+# 4 quality control(.fastq)
 cd ~/project/rat/output
 ## 4.1 quality assessment(fastqc)
 input:sequence (.fastq.gz)
@@ -269,7 +269,7 @@ parallel -j 4 "
 cd ../fastqc_trim
 multiqc .
 ```
-# 5 rm rRNA[optional]
+# 5 rm rRNA[optional](.fastq)
 cd ~/project/rat/output/rRNA
 input:trim (.fastq.gz > .fastq)
 ```
@@ -307,7 +307,7 @@ parallel -j 4 "
 # 6 seq alignment
 hisat2 samtools
 ## 6.1 build index(.ht2)
-input:genome (.fa)
+input:genome (.fa)<br>
 output:index (.ht2)
 ```
 hisat2-build [选项] [基因组序列(.fa)] [索引文件的前缀名]
@@ -319,7 +319,7 @@ cd index
 hisat2-build -p 6 ../rn7.chr1.fa rn7.chr1
 ```
 ## 6.2 alignment(.sam)
-input:trim/rRNA (.fastq.gz) -- index()
+input:trim/rRNA (.fastq.gz) -- index()<br>
 output:align (.sam;.log)
 ```
 hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成对测序文件 ] [ -S 输出的sam文件 ]
@@ -378,8 +378,25 @@ rm *.sam
 ls
 ```
 # 7 expression level count
-HTseq-count:<determine if the reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
-  
+> HTseq-count:determine if the RNA reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
 
+input:align (.sam);annotation (.gff) <br>
+output:HTseq (.count)
+```
+htseq-count [options] <alignment_files> <gff_file>
+
+cd ~/project/rat/output
+mkdir HTseq
+
+cd align
+parallel -j -4 "
+  htseq-count -s no -f bam {1}.sort.bam ../../annotation/rn6.gff \
+  >../HTseq/{1}.count 2>../HTseq/{1}.log
+" ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
+
+cd ../HTseq
+cat SRR2190795.count | head -n 10
+```
+# 8 merge&standardization
 
 
