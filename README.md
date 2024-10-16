@@ -378,8 +378,7 @@ rm *.sam
 ls
 ```
 # 7 expression level count
-HTseq-count:<br>
-  determine if the reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
+HTseq-count:<determine if the reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
   
 
 
