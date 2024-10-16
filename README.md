@@ -75,8 +75,8 @@ wget https://github.com/sortmerna/sortmerna/releases/download/v4.3.7/sortmerna-4
 tar -xvzf sortmerna-4.3.7.tar.gz
 cd sortmerna-4.3.7
 
-echo 'export PATH=~/biosoft/sortmerna-4.3.7:$PATH' >> ~/.bash_profile
-source ~/.bash_profile
+echo 'export PATH=~/biosoft/sortmerna-4.3.7:$PATH' >> ~/.bashrc
+source ~/.bashrc
 
 sortmerna -h
 
@@ -370,8 +370,7 @@ samtools
 input:align (.sam)
 ```
 parallel -k -j 4 "
-  samtools sort -@ 4 {1}.sam > {1}.sort.bam
-  samtools index {1}.sort.bam
+  samtools sort -@ 2 {1}.sam > {1}.sort.bam && samtools index {1}.sort.bam
 " ::: $(ls *.sam | perl -p -e 's/\.sam$//')
 
 rm *.sam
@@ -380,7 +379,7 @@ ls
 # 7 expression level count
 > HTseq-count:determine if the RNA reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
 
-input:align (.sam);annotation (.gff) <br>
+input:align (.bam);annotation (.gff) <br>
 output:HTseq (.count)
 ```
 htseq-count [options] <alignment_files> <gff_file>
@@ -390,13 +389,18 @@ mkdir HTseq
 
 cd align
 parallel -j -4 "
-  htseq-count -s no -f bam {1}.sort.bam ../../annotation/rn6.gff \
-  >../HTseq/{1}.count 2>../HTseq/{1}.log
+  htseq-count -s no -f bam {1}.sort.bam ../../annotation/rn7.gtf \
+    >../HTseq/{1}.count 2>../HTseq/{1}.log
 " ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
 
 cd ../HTseq
 cat SRR2190795.count | head -n 10
 ```
+parallel -k -j 4 "
+    htseq-count -s no -f bam {1}.sort.bam ../../annotation/rn7.gff \
+      >../HTseq/{1}.count  2>../HTseq/{1}.log
+" ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
+
 # 8 merge&standardization
 ```
 
