@@ -305,7 +305,7 @@ parallel -j 4 "
 " ::: $(ls *.fastq.gz | perl -n -e 'print $1. "\n" if m/(.+?)_/')
 ```
 # 6 seq alignment
-hisat2
+hisat2 samtools
 ## 6.1 build index(.ht2)
 input:genome (.fa)
 output:index (.ht2)
@@ -318,8 +318,9 @@ cd index
 
 hisat2-build -p 6 ../rn7.chr1.fa rn7.chr1
 ```
-## 6.2 alignment(.sam--.bam)
-cd ~/project/rat/output/align
+## 6.2 alignment(.sam)
+input:trim/rRNA (.fastq.gz) -- index()
+output:align (.sam;.log)
 ```
 hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成对测序文件 ] [ -S 输出的sam文件 ]
 
@@ -336,6 +337,7 @@ cd ../align
 cat SRR2190795.log
 ```
 * summarize alignment rate and time
+input:align (.log)
 ```
 file_list=$(ls *.log)
 for i in ${file_list[@]};
@@ -363,5 +365,21 @@ do
     '
 done
 ```
-* convert format&sort
+## 6.3 convert format&sort(.sam->.bam)
+samtools
+input:align (.sam)
+```
+parallel -k -j 4 "
+  samtools sort -@ 4 {1}.sam > {1}.sort.bam
+  samtools index {1}.sort.bam
+" ::: $(ls *.sam | perl -p -e 's/\.sam$//')
+
+rm *.sam
+ls
+```
+# 7 expression level count
+HTseq-count:<t>
+  determine if the reads belong to one gene
+
+
 
