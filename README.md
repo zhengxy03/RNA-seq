@@ -380,7 +380,7 @@ ls
 > HTseq-count:determine if the RNA reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
 
 input:align (.bam);annotation (.gff) <br>
-output:HTseq (.count)
+output:HTseq (.count)(id + count)
 ```
 htseq-count [options] <alignment_files> <gff_file>
 
@@ -396,11 +396,6 @@ parallel -j -4 "
 cd ../HTseq
 cat SRR2190795.count | head -n 10
 ```
-parallel -k -j 4 "
-    htseq-count -s no -f bam {1}.sort.bam ../../annotation/rn7.gff \
-      >../HTseq/{1}.count  2>../HTseq/{1}.log
-" ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
-
 # 8 merge&standardization
 ```
 
