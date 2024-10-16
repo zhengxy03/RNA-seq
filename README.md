@@ -92,7 +92,8 @@ cd ~/database/sortmerna_db
 ```
 ## 2.8 samtools
 ```
-wget -c https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2
+wget "https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2"
+tar jxvf samtools-1.21.tar.bz2
 cd samtools-1.21
 ./configure --prefix=$(pwd)
 make -j 4
@@ -339,6 +340,8 @@ cat SRR2190795.log
 file_list=$(ls *.log)
 for i in ${file_list[@]};
 do
+  prefix=$( echo ${i} | perl -p -e "s/\.log//" )
+  echo -n -e "${prefix}\t"
   perfix = $(echo ${i} | perl -p -e 's/\.log//')
   echo -n -e '${perfix}\t'
   cat ${i} |
@@ -359,3 +362,6 @@ do
       }
     '
 done
+```
+* convert format&sort
+
