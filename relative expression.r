@@ -18,3 +18,5 @@ gene_len <- lapply(exons_gene, function(x){sum(width(reduce(x)))})
 data <- t(as.data.frame((gene_len)))
 
 write.table(data, file="rn7_gene_len.tsv", row.names = TRUE, sep="\t", col.names = FALSE)
+
+#RPKM

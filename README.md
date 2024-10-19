@@ -433,5 +433,10 @@ write.csv(data_merge, "merge.csv", quote= FALSE, row.names = FALSE)
 CPM
 * different genes from one sample
 RPKM, FPKM, TPM
+#CPM
+CPM = (10^6 *nr) / N
+
+#RPKM
+RPKM = (10^6 *nr) / (L * N)
 ```
 
