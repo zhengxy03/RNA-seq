@@ -398,7 +398,7 @@ cat SRR2190795.count | head -n 10
 ```
 # 8 merge&standardization
 ## 8.1 merge HTseq-count results
-input:HTseq (*.count)
+input:HTseq (*.count) <br>
 output:merge.csv
 ```
 rm(list=ls())
@@ -432,11 +432,32 @@ write.csv(data_merge, "merge.csv", quote= FALSE, row.names = FALSE)
 * same gene from different samples
 CPM
 * different genes from one sample
-RPKM, FPKM, TPM
-#CPM
-CPM = (10^6 *nr) / N
+RPKM, FPKM, TPM <br>
 
-#RPKM
-RPKM = (10^6 *nr) / (L * N)
+CPM = (10^6 *nr) / N <br>
+RPKM = (10^6 *nr) / (L * N) <br>
+TPM = (nr / g_r) * 10^6 / ∑(ni / gi)
+### 8.2.1 cufflinks
+### 8.2.2 manual calculation
+* gene_length
+input:annotation (.gff) <br>
+output:rn7_gene_len.tsv
 ```
+library(GenomicFeatures)
+txdb <- makeTxDbFromGFF("rn7.gff")
 
+exons_gene <- exonsBy(txdb, by= "gene")
+gene_len <- list()
+for (i in names(exons_gene)){
+  range_info = reduce(exons_gene[[i]])
+  width_info = width(raneg_info)
+  sum_len = sum(width_info)
+  gene_len[[i]] = sum_len
+}
+#lapply
+gene_len <- lapply(exons_gene, function(x{sum(width(reduce(x)))}))
+
+data <- t(as.data.fram(gene_len))
+write.table(data, file = "rn7_gene_len.tsv", row.names = TRUE, sep="\t", quote = FALSE, col.names = FALSE)
+```
+* RPKM

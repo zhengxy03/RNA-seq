@@ -20,3 +20,11 @@ data <- t(as.data.frame((gene_len)))
 write.table(data, file="rn7_gene_len.tsv", row.names = TRUE, sep="\t", col.names = FALSE)
 
 #RPKM
+gene_len_file <- "rn7_gene_len.tsv" #annotation_exons_length
+count_file <- "samples.count" #HEseq
+
+gene_len <- read.table(gene_len_file, header = FALSE, row.name = 1)
+colnames(gene_len) <- c("length")
+
+count <- read.table(count_file, header = FALSE, row.name = 1)
+colnames(count) <-c("count")
