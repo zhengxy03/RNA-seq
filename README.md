@@ -397,6 +397,9 @@ cd ../HTseq
 cat SRR2190795.count | head -n 10
 ```
 # 8 merge&standardization
+## 8.1 merge HTseq-count results
+input:HTseq (*.count)
+output:merge.csv
 ```
 rm(list=ls())
 
@@ -424,5 +427,11 @@ for (i in seq(2,length(id_list))){
 }
 
 write.csv(data_merge, "merge.csv", quote= FALSE, row.names = FALSE)
+```
+## 8.2 standardization
+* same gene from different samples
+CPM
+* different genes from one sample
+RPKM, FPKM, TPM
 ```
 
