@@ -436,12 +436,20 @@ RPKM, FPKM, TPM <br>
 
 CPM = (10^6 *nr) / N <br>
 RPKM = (10^6 *nr) / (L * N) <br>
+  * RPKM: Reads Per Kilobase per Million
+  * nr : 比对至目标基因的read数量
+  * L : 目标基因的外显子长度之和除以1000(因此，要注意这里的L单位是kb，不是bp)
+  * N : 是总有效比对至基因组的read数量
 TPM = (nr / g_r) * 10^6 / ∑(ni / gi)
+  * TPM : Transcripts Per Million
+  * nr : 比对至目标基因的read数量
+  * read_r: 是比对至基因r的平均read长度
+  * g_r : 是基因r的外显子长度之和（这里无需将其除以1000）
 ### 8.2.1 cufflinks
 ### 8.2.2 manual calculation
 * gene_length
 input:annotation (.gff) <br>
-output:rn7_gene_len.tsv
+output:HTseq (rn7_gene_len.tsv)
 ```
 library(GenomicFeatures)
 txdb <- makeTxDbFromGFF("rn7.gff")
@@ -461,3 +469,31 @@ data <- t(as.data.fram(gene_len))
 write.table(data, file = "rn7_gene_len.tsv", row.names = TRUE, sep="\t", quote = FALSE, col.names = FALSE)
 ```
 * RPKM
+RPKM = (10^6 *nr) / (L * N) <br>
+input:HTseq (rn7_gene_len.tsv);(*.count) <br>
+output: count["RPKM"]
+```
+gene_len_file <- "rn7_gene_len.tsv"
+gene_len <- read.table(gene_len_file, header =FALSE, row.name = 1)
+colnames(gene_len) <- c("length")
+
+count_file <- "SRR2190795.count"
+count <- read.table(count_file, header = FALSE, row.name = 1)
+colnames(count) <- c("count")
+all_count <- sum(count["count"])
+
+RPKM <- c()
+for (i in row.names(count)){
+  count = 0
+  rpkm = 0
+  exon_kb =1
+  count_ = count[i, ]
+  exon_kb = gene_len[i, ] / 1000
+  rpkm = (10 ^ 6 * count_ ) / (exon_kb * all_count )
+  RPKM = c(RPKM, rpkm)
+}
+count["RPKM"] <- RPKM
+```
+* TPM
+TPM = (nr / g_r) * 10^6 / ∑(ni / gi)
+```
