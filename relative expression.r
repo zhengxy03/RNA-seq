@@ -42,3 +42,13 @@ for (i in row.names(count)){
     RPKM = c(RPKM, rpkm)
 }
 count["RPKM"] <- RPKM
+
+#TPM
+sum <- 0
+for(i in row.names(count)){
+    count_ = 0
+    exon = 1
+    count_ = count[i, ]
+    exon  = gene_len[i, ]
+    value = count_ / exon
+    if()
