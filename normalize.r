@@ -44,11 +44,31 @@ for (i in row.names(count)){
 count["RPKM"] <- RPKM
 
 #TPM
-sum <- 0
+sum_ <- 0
 for(i in row.names(count)){
     count_ = 0
     exon = 1
     count_ = count[i, ]
     exon  = gene_len[i, ]
     value = count_ / exon
-    if()
+    if(is.na(value)){
+        print(paste(i, "is error! please check"))
+    }else{
+        sum_ = sum_ + value
+    }
+}
+
+TMP <- c()
+for (i in row.names(count)){
+    count_ = 0
+    tpm = 0
+    exon = 1
+    count_ = count[i, ]
+    exon = gene_len[i, ]
+    tpm = (10 ^ 6 * count_ / exon ) / sum_
+    TPM = c(TPM, tpm)\
+}
+count["TPM"] <- TPM
+
+write.table(count, "SRR2190795.normalize.count", col.names = TRUE, row.names = TRUE, sep="\t", quote = FALSE)
+
