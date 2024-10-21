@@ -495,5 +495,74 @@ for (i in row.names(count)){
 count["RPKM"] <- RPKM
 ```
 * TPM
-TPM = (nr / g_r) * 10^6 / ∑(ni / gi)
+TPM = (nr / g_r) * 10^6 / ∑(ni / gi) <br>
+input:gene-len;*.count <br>
+output:count["TPM"];"*.normalize.count"
+```
+sum_ <- 0
+for(i in row.names(count)){
+    count_ = 0
+    exon = 1
+    count_ = count[i, ]
+    exon  = gene_len[i, ]
+    value = count_ / exon
+    if(is.na(value)){
+        print(paste(i, "is error! please check"))
+    }else{
+        sum_ = sum_ + value
+    }
+}
+
+TMP <- c()
+for (i in row.names(count)){
+    count_ = 0
+    tpm = 0
+    exon = 1
+    count_ = count[i, ]
+    exon = gene_len[i, ]
+    tpm = (10 ^ 6 * count_ / exon ) / sum_
+    TPM = c(TPM, tpm)\
+}
+count["TPM"] <- TPM
+
+write.table(count, "SRR2190795.normalize.count", col.names = TRUE, row.names = TRUE, sep="\t", quote = FALSE)
+```
+# 9 differential expression
+## 9.1 pre-treatment
+```
+dataframe <- read.csv("merge.csv, header = TRUE, row.name = 1)
+
+#delete head 5 lines
+countdata <- dataframe[-(1:5), ]
+head(countdata)
+
+# delete ID version-number
+row_names <- row.names(countdata)
+new_row_names <- gsub("\\.\\w+","", row.names(countdata))
+row.names(countdata) <- new_row_names
+
+# remove low-expression gene
+countdata <- countdata[rowSum(countdata) > 0, ]
+```
+## 9.2 differential expression
+DEseq2(raw data--HTseq--*.count)
+### 9.2.1 download packages
+```
+# use bioconductor to download
+source("http://bioconductor.org/biocLite.R")
+options(BioC_mirror="http://mirrors.ustc.edu.cn/bioc/")
+
+# package
+biocLite("DESeq2")
+biocLite("pheatmap")
+biocLite("biomaRt")
+biocLite("org.Rn.eg.db")
+biocLite("clusterProfiler")
+
+# load
+library(DESeq2)
+library(pheatmap)
+library(biomaRt)
+library(org.Rn.eg.db)
+library(clusterProfiler)
 ```
