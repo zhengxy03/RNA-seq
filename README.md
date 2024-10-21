@@ -577,7 +577,9 @@ dds <- DESeqDataSetFromMatrix(countData = cts, colData = coldata, design= ~ batc
 * countData
 merge.csv--pre-treatment(countdata)
 * colData
-input:sequence (*.sra--experiment)--coldata
+input:sequence (phenotype.csv)
+* design
+phenotype.csv--treatment
 ```
 #bash
 cat <<EOF >./phenotype/phenotype.csv
@@ -602,12 +604,86 @@ dds
 ### 9.2.3 sample correlation
 * PCA
 rlog vst<br>
-input:dds
+input:dds(countdata,coldata,design)
+output:PCA
 ```
 vsdata <- rlog(dds, blind=FALSE)
 plotPCA(vsdata, intgroup="treatment") + ylim(-10, -10)
 ```
 * sample-to-sample distances heat map
+input:vsdata(dds)
+output:heat map
 ```
 library("RColorBrewer")
 gene_data_transform <- assay(vsdata)
+sampleDists <- dist(t(gene_data_transform))
+sampleDistsMatrix <- as.matrix(sampleDists)
+# rownames(sampleDistMatrix) <- paste(vsdata$treatment, vsdata$condition, vsdata$ids, sep="-")
+# colnames(sampleDistMatrix) <- paste(vsdata$treatment, vsdata$condition, vsdata$ids, sep="-")
+colors <- colorRampPalette(rev(brewer.pal(9, "Blue")))(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+```
+### 9.2.4 differential expression gene
+difference between different samples
+input:dds
+```
+dds$treatment <- factor(as.vector(dds$treatment), levels = c("control","treatment"))
+dds <- DESeq(dds)
+```
+> 估计样本大小（消除测序深度的影响）
+> 对每一个基因的表达量的离散度做计算
+> 拟合广义的线性模型（generalized linear model）
+```
+result <- results(dds, pAdjustMethod = "fdr", alpha = 0.05)
+head(result)
+result_order <- result[order(result$pvalue),]
+head(result_order)
+```
+output:
+```
+log2 fold change (MLE): treatment treatment vs control 
+Wald test p-value: treatment treatment vs control 
+DataFrame with 6 rows and 6 columns
+                           baseMean    log2FoldChange             lfcSE              stat               pvalue                 padj
+                          <numeric>         <numeric>         <numeric>         <numeric>            <numeric>            <numeric>
+ENSRNOG00000011250 208.046881231885 -7.50369356010508  0.44485821990427 -16.8676068562245 7.78886122158816e-64 1.14472893373681e-59
+ENSRNOG00000047945 3799.51961509786  4.50434780195392 0.358671277660941  12.5584290755837 3.57357467823096e-36 2.62604135229802e-32
+ENSRNOG00000017897 1130.41206772961  4.41361091204456 0.353924586455456  12.4704840549416 1.08166978868575e-35 5.29910029477147e-32
+ENSRNOG00000001466 542.805654192746  4.87418957369525 0.412058420866664  11.8288799035913 2.76810877295631e-32 1.01707236590347e-28
+ENSRNOG00000014013 400.690803761036  2.83690340404308 0.246440071910237  11.5115345570764 1.15406329271928e-30 3.39225364261904e-27
+ENSRNOG00000018371 705.943312960284  4.65111741552834  0.41021741987017  11.3381762700384  8.4895191640983e-30 2.07950771924588e-26
+```
+analysis:
+* upregulate/downregulate
+```
+summary(result_order)
+```
+output:
+```
+out of 19962 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)       : 2248, 11%
+LFC < 0 (down)     : 1148, 5.8%
+outliers [1]       : 31, 0.16%  #异常值
+low counts [2]     : 5234, 26%
+(mean count < 2)
+[1] see 'cooksCutoff' argument of ?results
+[2] see 'independentFiltering' argument of ?results
+```
+* significant gene number
+```
+table(result_order$padj<0.05)
+```
+output:
+```
+FALSE  TRUE 
+11301  3396
+```
+* save results
+```
+dir.create("../DESeq2") #output
+write.csv(result, file="../DESeq2/results.csv", quote = F)
+```
