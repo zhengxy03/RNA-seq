@@ -571,12 +571,12 @@ library(clusterProfiler)
 ```
 ### 9.2.2 create DESeqDataSet(dds)
 ```
-dds <- DESeqDataSetFromMatrix(countData)>
+dds <- DESeqDataSetFromMatrix(countData = cts, colData = coldata, design= ~ batch + condition)
+```
 * countData
 merge.csv--pre-treatment
 * colData
 input:sequence (*.sra--experiment)
-
 ```
 #bash
 cat <<EOf >./phenotype/phenotype.csv
@@ -588,3 +588,13 @@ cat <<EOf >./phenotype/phenotype.csv
 EOF
 ```
 R
+```
+countdata
+
+coldata <- read.table("../phenotype/phenotype.csv", row.names = 1, header = TRUE, sep = "," )
+head(coldata)
+countdata <- countdata[row.names(coldata)]
+
+dds <- DESeqDataSetFromMatrix(countData = countdata, colData = coldata, design = ~ treatment)
+dds
+```
