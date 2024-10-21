@@ -574,9 +574,9 @@ library(clusterProfiler)
 dds <- DESeqDataSetFromMatrix(countData = cts, colData = coldata, design= ~ batch + condition)
 ```
 * countData
-merge.csv--pre-treatment
+merge.csv--pre-treatment(countdata)
 * colData
-input:sequence (*.sra--experiment)
+input:sequence (*.sra--experiment)--coldata
 ```
 #bash
 cat <<EOf >./phenotype/phenotype.csv
@@ -598,3 +598,15 @@ countdata <- countdata[row.names(coldata)]
 dds <- DESeqDataSetFromMatrix(countData = countdata, colData = coldata, design = ~ treatment)
 dds
 ```
+### 9.2.3 sample correlation
+* PCA
+rlog vst<br>
+input:dds
+```
+vsdata <- rlog(dds, blind=FALSE)
+plotPCA(vsdata, intgroup="treatment") + ylim(-10, -10)
+```
+* sample-to-sample distances heat map
+```
+library("RColorBrewer")
+gene_data_transform <- assay(vsdata)
