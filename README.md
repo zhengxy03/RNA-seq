@@ -184,13 +184,13 @@ head rn7.gff
 
 ## 3.2 Experimental Data(.sra)
 cd ~/project/rat/sequence
-* NCBI-GEO >> GEO accession
-* SRA Run Selector
+* NCBI-GEO >> GEO accession (GSE72960)
+* SRA Run Selector (SRP063345)
 * download
 ```
 nohup prefetch SRR2190795 SRR224018{2..7} SRR2240228 -O . &
 ```
-* convert format(.sar > .fastq > .gz)
+* convert format(.sra > .fastq > .gz)
 ```
 array=(SRR2190795 SRR224018{2..7} SRR2240228)
 for i in "${array[@]}"; do
@@ -506,7 +506,8 @@ for(i in row.names(count)){
     count_ = count[i, ]
     exon  = gene_len[i, ]
     value = count_ / exon
-    if(is.na(value)){
+    na_values <- is.na(value)
+    if(is.na(value)){
         print(paste(i, "is error! please check"))
     }else{
         sum_ = sum_ + value
@@ -579,7 +580,7 @@ merge.csv--pre-treatment(countdata)
 input:sequence (*.sra--experiment)--coldata
 ```
 #bash
-cat <<EOf >./phenotype/phenotype.csv
+cat <<EOF >./phenotype/phenotype.csv
 "ids","state","condition","treatment"
 "SRR2240185","Liver cirrhosis","DEN","treatment"
 "SRR2240186","Liver cirrhosis","DEN","treatment"

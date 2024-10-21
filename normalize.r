@@ -48,23 +48,24 @@ sum_ <- 0
 for(i in row.names(count)){
     count_ = 0
     exon = 1
-    count_ = count[i, ]
-    exon  = gene_len[i, ]
+    count_ = count[i, 1]
+    exon  = gene_len[i, 1]
     value = count_ / exon
-    if(is.na(value)){
+    na_values <- is.na(value)
+    if(any(na_values)){
         print(paste(i, "is error! please check"))
     }else{
         sum_ = sum_ + value
     }
 }
 
-TMP <- c()
+TPM <- c()
 for (i in row.names(count)){
     count_ = 0
     tpm = 0
     exon = 1
-    count_ = count[i, ]
-    exon = gene_len[i, ]
+    count_ = count[i, 1]
+    exon = gene_len[i, 1]
     tpm = (10 ^ 6 * count_ / exon ) / sum_
     TPM = c(TPM, tpm)
 }
