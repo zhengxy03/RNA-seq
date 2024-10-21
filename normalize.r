@@ -66,7 +66,7 @@ for (i in row.names(count)){
     count_ = count[i, ]
     exon = gene_len[i, ]
     tpm = (10 ^ 6 * count_ / exon ) / sum_
-    TPM = c(TPM, tpm)\
+    TPM = c(TPM, tpm)
 }
 count["TPM"] <- TPM
 

@@ -501,27 +501,27 @@ output:count["TPM"];"*.normalize.count"
 ```
 sum_ <- 0
 for(i in row.names(count)){
-    count_ = 0
-    exon = 1
-    count_ = count[i, ]
-    exon  = gene_len[i, ]
-    value = count_ / exon
-    if(is.na(value)){
-        print(paste(i, "is error! please check"))
-    }else{
-        sum_ = sum_ + value
-    }
+    count_ = 0
+    exon = 1
+    count_ = count[i, ]
+    exon  = gene_len[i, ]
+    value = count_ / exon
+    if(is.na(value)){
+        print(paste(i, "is error! please check"))
+    }else{
+        sum_ = sum_ + value
+    }
 }
 
 TMP <- c()
 for (i in row.names(count)){
-    count_ = 0
-    tpm = 0
-    exon = 1
-    count_ = count[i, ]
-    exon = gene_len[i, ]
-    tpm = (10 ^ 6 * count_ / exon ) / sum_
-    TPM = c(TPM, tpm)\
+    count_ = 0
+    tpm = 0
+    exon = 1
+    count_ = count[i, ]
+    exon = gene_len[i, ]
+    tpm = (10 ^ 6 * count_ / exon ) / sum_
+    TPM = c(TPM, tpm)\
 }
 count["TPM"] <- TPM
 
@@ -548,18 +548,18 @@ countdata <- countdata[rowSum(countdata) > 0, ]
 DEseq2(raw data--HTseq--*.count)
 ### 9.2.1 download packages
 ```
-# 使用bioconductor进行安装
+# use bioconductor to download
 source("http://bioconductor.org/biocLite.R")
 options(BioC_mirror="http://mirrors.ustc.edu.cn/bioc/")
 
-# 安装包
+# package
 biocLite("DESeq2")
 biocLite("pheatmap")
 biocLite("biomaRt")
 biocLite("org.Rn.eg.db")
 biocLite("clusterProfiler")
 
-# 加载
+# load
 library(DESeq2)
 library(pheatmap)
 library(biomaRt)
