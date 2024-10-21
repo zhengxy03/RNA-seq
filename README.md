@@ -521,7 +521,7 @@ for (i in row.names(count)){
     count_ = count[i, ]
     exon = gene_len[i, ]
     tpm = (10 ^ 6 * count_ / exon ) / sum_
-    TPM = c(TPM, tpm)\
+    TPM = c(TPM, tpm)
 }
 count["TPM"] <- TPM
 
@@ -546,6 +546,9 @@ countdata <- countdata[rowSum(countdata) > 0, ]
 ```
 ## 9.2 differential expression
 DEseq2(raw data--HTseq--*.count)
+> 构建一个dds(DESeqDataSet)的对象
+> 利用DESeq函数进行标准化处理
+> 用result函数来提取差异比较的结果
 ### 9.2.1 download packages
 ```
 # use bioconductor to download
@@ -566,3 +569,22 @@ library(biomaRt)
 library(org.Rn.eg.db)
 library(clusterProfiler)
 ```
+### 9.2.2 create DESeqDataSet(dds)
+```
+dds <- DESeqDataSetFromMatrix(countData)>
+* countData
+merge.csv--pre-treatment
+* colData
+input:sequence (*.sra--experiment)
+
+```
+#bash
+cat <<EOf >./phenotype/phenotype.csv
+"ids","state","condition","treatment"
+"SRR2240185","Liver cirrhosis","DEN","treatment"
+"SRR2240186","Liver cirrhosis","DEN","treatment"
+"SRR2240187","Healthy control","PBS","control"
+"SRR2240228","Healthy control","PBS","control"
+EOF
+```
+R
