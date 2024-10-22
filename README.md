@@ -560,8 +560,8 @@ options(BioC_mirror="http://mirrors.ustc.edu.cn/bioc/")
 biocLite("DESeq2")
 biocLite("pheatmap")
 biocLite("biomaRt")
-biocLite("org.Rn.eg.db")
-biocLite("clusterProfiler")
+biocLite("org.Rn.eg.db")  #rat database
+biocLite("clusterProfiler") 
 
 # load
 library(DESeq2)
@@ -687,3 +687,36 @@ FALSE  TRUE
 dir.create("../DESeq2") #output
 write.csv(result, file="../DESeq2/results.csv", quote = F)
 ```
+# 10 find diff_gene
+## 10.1 diff_gene
+input:result_order
+```
+diff_gene <- subset(result_order, padj < 0.05 & abs(log2FoldChange) > 1)
+dim(diff_gene)
+write.csv(diff_gene, file="../DESeq2/difference.csv", quote = F)
+```
+## 10.2 convert ensembl gene ID(ClusterProfiler)
+```
+ensembl_gene_id <- row.names(diff_gene)
+ensembl_id_transform <- function(ENSEMBL_ID){
+    # geneID是输入的基因ID，fromType是输入的ID类型，toType是输出的ID类型，OrgDb注释的db文件，drop表示是否剔除NA数据
+    a = bitr(ENSEMBL_ID, fromType="ENSEMBL", toType=c("SYMBOL","ENTREZID"), OrgDb="org.Rn.eg.db")
+    return(a) 
+}
+ensembl_if_transform(ensembl_gene_id)
+```
+## 10.3 annotation(biomaRt)
+```
+#choose database
+mart <- useDataset("rnorvegicus_gene_ensembl", useMart("ENSEMBL_MART_ENSEMBL"))
+ensembl_gene_id <- row.names(diff_gene)
+rat_symbols <- getBM(attributes=c("ensembl_gene_id","external_gene_name","entrezgene_id", "description"), filters = 'ensembl_gene_id', values = ensembl_gene_id, mart = mart)
+
+diff_gene$ensembl_gene_id <- ensembl_gene_id
+diff_gene_dataframe <- as.data.frame(diff_gene)
+diff_gene_symbols <- merge(diff_gene_dataframe, rat_symbols, by= c("ensembl_gene_id"))
+
+#save data
+write.table(result, "../stat/all_gene.tsv", sep="\t", quote = FALSE)
+write.table(diff_gene_symbols, "../stat/diff_gene.tsv", row.names = F,sep="\t", quote = FALSE)
+

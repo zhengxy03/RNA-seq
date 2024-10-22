@@ -28,3 +28,15 @@ library(pheatmap)
 library(biomaRt)
 library(org.Rn.eg.db)
 library(clusterProfiler)
+
+
+#create dds
+setwd("//wsl.localhost/Ubuntu/home/zxy0303/project/rat/output")
+coldata <- read.table("../phenotype/phenotype.csv", row.names = 1, header = TRUE, sep = "," )
+
+head(coldata)
+countdata <- countdata[row.names(coldata)]
+
+dds <- DESeqDataSetFromMatrix(countData = countdata, colData = coldata, design = ~ treatment)
+dds
+
