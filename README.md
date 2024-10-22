@@ -712,6 +712,7 @@ mart <- useDataset("rnorvegicus_gene_ensembl", useMart("ENSEMBL_MART_ENSEMBL"))
 ensembl_gene_id <- row.names(diff_gene)
 rat_symbols <- getBM(attributes=c("ensembl_gene_id","external_gene_name","entrezgene_id", "description"), filters = 'ensembl_gene_id', values = ensembl_gene_id, mart = mart)
 
+#merge diff_gene & symbols
 diff_gene$ensembl_gene_id <- ensembl_gene_id
 diff_gene_dataframe <- as.data.frame(diff_gene)
 diff_gene_symbols <- merge(diff_gene_dataframe, rat_symbols, by= c("ensembl_gene_id"))
@@ -719,4 +720,7 @@ diff_gene_symbols <- merge(diff_gene_dataframe, rat_symbols, by= c("ensembl_gene
 #save data
 write.table(result, "../stat/all_gene.tsv", sep="\t", quote = FALSE)
 write.table(diff_gene_symbols, "../stat/diff_gene.tsv", row.names = F,sep="\t", quote = FALSE)
+
+#count diff_gene
+
 
