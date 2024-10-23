@@ -707,7 +707,7 @@ ensembl_if_transform(ensembl_gene_id)
 ```
 ## 10.3 annotation(biomaRt)
 ```
-#choose database
+#choose database & get symbols
 mart <- useDataset("rnorvegicus_gene_ensembl", useMart("ENSEMBL_MART_ENSEMBL"))
 ensembl_gene_id <- row.names(diff_gene)
 rat_symbols <- getBM(attributes=c("ensembl_gene_id","external_gene_name","entrezgene_id", "description"), filters = 'ensembl_gene_id', values = ensembl_gene_id, mart = mart)
@@ -742,3 +742,33 @@ pdf("samples_diff_gene_num.pdf")
   labs(x= "samples", y= "num", title= "different gene number")
 dev.off()
 
+
+```
+# 11 visualize
+* MA plot
+```
+plotMA(result_order, ylim=c(-10,10))
+```
+* heat map
+# 12 enrichment analysis
+* ClusterProfiler
+```
+ensembl_gene_id <- row.names(diff_gene)
+rat_symbols <- getBM(attributes=c("ensembl_gene_id", "external_gene_name", "entrezgene_id", "description"), filters='ensembl_gene_id', values=ensembl_gene_id, mart=mart)
+diff_gene_ensembl_id <- rat_symbols$ensembl_gene_id
+```
+## 12.1 GO analysis
+molecular function(MF), biological process(BP), cellular component(CC)
+```
+for (i in c("MF", "BP", "CC")){
+  ego <- enrichGO(gene = rat_symbols$entrezgene_id,
+    OrgDb = org.Rn.eg.db,
+    keyType = 'ENSEMBL',
+    ont = i,
+    pAdjustMethod = "BH",
+    pvalueCutoff = 0.01
+    qvalueCutoff = 0.05)
+  dotplot(ego, showCategory = 30, title = paste("The GO", i, "enrichment analysis", sep=""))
+}
+```
+## 12.1 KEGG
