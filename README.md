@@ -741,8 +741,6 @@ pdf("samples_diff_gene_num.pdf")
   geom_bar(stat = "identity", position = "dodge") +
   labs(x= "samples", y= "num", title= "different gene number")
 dev.off()
-
-
 ```
 # 11 visualize
 * MA plot

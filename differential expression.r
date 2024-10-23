@@ -40,7 +40,21 @@ countdata <- countdata[row.names(coldata)]
 dds <- DESeqDataSetFromMatrix(countData = countdata, colData = coldata, design = ~ treatment)
 dds
 
-#sample correlation
+#sample correlation(plot)
+vsdata <- rlog(dds, blind=FALSE)
+plotPCA(vsdata, intgroup="treatment") + ylim(-10, -10)
+
+library("RColorBrewer")
+gene_data_transform <- assay(vsdata)
+sampleDists <- dist(t(gene_data_transform))
+sampleDistsMatrix <- as.matrix(sampleDists)
+# rownames(sampleDistMatrix) <- paste(vsdata$treatment, vsdata$condition, vsdata$ids, sep="-")
+# colnames(sampleDistMatrix) <- paste(vsdata$treatment, vsdata$condition, vsdata$ids, sep="-")
+colors <- colorRampPalette(rev(brewer.pal(9, "Blue")))(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
 
 #results
 dds$treatment <- factor(as.vector(dds$treatment), levels = c("control","treatment"))
@@ -54,7 +68,7 @@ head(result_order)
 dir.create("../DESeq2") #output
 write.csv(result, file="../DESeq2/results.csv", quote = F)
 
-#analysis
+#analysis results
 summary(result_order)
 
 table(result_order$padj<0.05)
