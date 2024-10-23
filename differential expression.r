@@ -40,3 +40,28 @@ countdata <- countdata[row.names(coldata)]
 dds <- DESeqDataSetFromMatrix(countData = countdata, colData = coldata, design = ~ treatment)
 dds
 
+#sample correlation
+
+#results
+dds$treatment <- factor(as.vector(dds$treatment), levels = c("control","treatment"))
+dds <- DESeq(dds)
+
+result <- results(dds, pAdjustMethod = "fdr", alpha = 0.05)
+head(result)
+result_order <- result[order(result$pvalue),]
+head(result_order)
+
+dir.create("../DESeq2") #output
+write.csv(result, file="../DESeq2/results.csv", quote = F)
+
+#analysis
+summary(result_order)
+
+table(result_order$padj<0.05)
+
+#different genes
+diff_gene <- subset(result_order, padj < 0.05 & abs(log2FoldChange) > 1)
+dim(diff_gene)
+write.csv(diff_gene, file="../DESeq2/difference.csv", quote = F)
+
+plotMA(result_order, ylim=c(-10,10))
