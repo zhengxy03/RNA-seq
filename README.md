@@ -722,5 +722,23 @@ write.table(result, "../stat/all_gene.tsv", sep="\t", quote = FALSE)
 write.table(diff_gene_symbols, "../stat/diff_gene.tsv", row.names = F,sep="\t", quote = FALSE)
 
 #count diff_gene
+echo -e "sample\t\num" > all.samples.csv
+for i in ${ls};
+do
+  if [-d ${i}];then
+    prefix=$i
+    diff_num=$(cat $i/diff_gene.tsv | tail -n+2 | wc -l)
+    echo -e "${predix}\t${diff_num}" >> all_samples.tsv
+    fi
+done
 
+#plot
+library(ggplot2)
+data <- read.table("all_sampels.tsv", head=T)
+
+pdf("samples_diff_gene_num.pdf")
+  ggplot(data=data, aes(x=sample, y=num, fill=samples)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x= "samples", y= "num", title= "different gene number")
+dev.off()
 
