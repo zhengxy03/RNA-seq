@@ -11,24 +11,17 @@ row.names(countdata) <- new_row_names
 countdata <- countdata[rowSums(countdata) > 0,]
 
 #download
-# 使用bioconductor进行安装
-source("http://bioconductor.org/biocLite.R")
-options(BioC_mirror="http://mirrors.ustc.edu.cn/bioc/")
+BiocManager::install("DESeq2")
+BiocManager::install("pheatmap")
+BiocManager::install("biomaRt")
+BiocManager::install("org.Rn.eg.db")
+BiocManager::install("clusterProfiler")
 
-# 安装包
-biocLite("DESeq2")
-biocLite("pheatmap")
-biocLite("biomaRt")
-biocLite("org.Rn.eg.db")
-biocLite("clusterProfiler")
-
-# 加载
 library(DESeq2)
 library(pheatmap)
 library(biomaRt)
 library(org.Rn.eg.db)
 library(clusterProfiler)
-
 
 #create dds
 setwd("//wsl.localhost/Ubuntu/home/zxy0303/project/rat/output")
@@ -42,7 +35,7 @@ dds
 
 #sample correlation(plot)
 vsdata <- rlog(dds, blind=FALSE)
-plotPCA(vsdata, intgroup="treatment") + ylim(-10, -10)
+plotPCA(vsdata, intgroup="treatment") + ylim(-10, 10)
 
 library("RColorBrewer")
 gene_data_transform <- assay(vsdata)
@@ -79,3 +72,30 @@ dim(diff_gene)
 write.csv(diff_gene, file="../DESeq2/difference.csv", quote = F)
 
 plotMA(result_order, ylim=c(-10,10))
+
+#biomaRt
+#choose database & get symbols
+mart <- useDataset("rnorvegicus_gene_ensembl", useMart("ENSEMBL_MART_ENSEMBL"))
+ensembl_gene_id <- row.names(diff_gene)
+rat_symbols <- getBM(attributes=c("ensembl_gene_id","external_gene_name","entrezgene_id", "description"), filters = 'ensembl_gene_id', values = ensembl_gene_id, mart = mart)
+
+#merge diff_gene & symbols
+diff_gene$ensembl_gene_id <- ensembl_gene_id
+diff_gene_dataframe <- as.data.frame(diff_gene)
+diff_gene_symbols <- merge(diff_gene_dataframe, rat_symbols, by= c("ensembl_gene_id"))
+
+#save data
+write.table(result, "../stat/all_gene.tsv", sep="\t", quote = FALSE)
+write.table(diff_gene_symbols, "../stat/diff_gene.tsv", row.names = F,sep="\t", quote = FALSE)
+
+#count diff_gene(bash)
+
+#plot
+library(ggplot2)
+data <- read.table("all_sampels.tsv", head=T)
+
+pdf("samples_diff_gene_num.pdf")
+  ggplot(data=data, aes(x=sample, y=num, fill=samples)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x= "samples", y= "num", title= "different gene number")
+dev.off()

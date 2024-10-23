@@ -552,18 +552,13 @@ DEseq2(raw data--HTseq--*.count)
 > 用result函数来提取差异比较的结果
 ### 9.2.1 download packages
 ```
-# use bioconductor to download
-source("http://bioconductor.org/biocLite.R")
-options(BioC_mirror="http://mirrors.ustc.edu.cn/bioc/")
+#download
+BiocManager::install("DESeq2")
+BiocManager::install("pheatmap")
+BiocManager::install("biomaRt")
+BiocManager::install("org.Rn.eg.db")
+BiocManager::install("clusterProfiler")
 
-# package
-biocLite("DESeq2")
-biocLite("pheatmap")
-biocLite("biomaRt")
-biocLite("org.Rn.eg.db")  #rat database
-biocLite("clusterProfiler") 
-
-# load
 library(DESeq2)
 library(pheatmap)
 library(biomaRt)
@@ -758,15 +753,28 @@ diff_gene_ensembl_id <- rat_symbols$ensembl_gene_id
 ## 12.1 GO analysis
 molecular function(MF), biological process(BP), cellular component(CC)
 ```
-for (i in c("MF", "BP", "CC")){
-  ego <- enrichGO(gene = rat_symbols$entrezgene_id,
-    OrgDb = org.Rn.eg.db,
-    keyType = 'ENSEMBL',
-    ont = i,
-    pAdjustMethod = "BH",
-    pvalueCutoff = 0.01
-    qvalueCutoff = 0.05)
-  dotplot(ego, showCategory = 30, title = paste("The GO", i, "enrichment analysis", sep=""))
+for(i in c("MF", "BP", "CC")){
+    ego <- enrichGO(gene       = rat_symbols$entrezgene_id,
+                    OrgDb      = org.Rn.eg.db,
+                    keyType    = 'ENSEMBL',
+                    ont        = i,
+                    pAdjustMethod = "BH",
+                    pvalueCutoff = 0.01,
+                    qvalueCutoff = 0.05)
+    dotplot(ego, showCategory = 30, title = paste("The GO ", i, " enrichment analysis", sep = ""))
 }
 ```
-## 12.1 KEGG
+## 12.2 KEGG
+```
+kk <- enrichKEGG(gene = gene, 
+                 organism ='rno',
+                 pvalueCutoff = 0.05,
+                 qvalueCutoff = 0.05,
+                 minGSSize = 1,
+                 #readable = TRUE ,
+                 use_internal_data = FALSE)
+```
+## 12.3 GSEA
+## 12.4 DO
+## 12.5 ReactomePA
+                 
