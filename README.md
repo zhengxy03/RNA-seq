@@ -110,6 +110,7 @@ brew install parallel
 ## 2.11 StringTie[optional]
 ```
 wget http://ccb.jhu.edu/software/stringtie/dl/stringtie-2.2.3.tar.gz
+tar -xzvf stringtie-2.2.3.tar.gz
 ```
 ## 2.12 Ballgown[optional]
 ```
@@ -306,6 +307,9 @@ parallel -j 4 "
 ```
 # 6 seq alignment
 hisat2 samtools
+> Hisat2是一种用于转录组数据比对的软件
+* Hisat2使用两种类型的索引，全局索引和局部索引。全局索引基于Burrows-Wheeler Transform (BWT)和Ferragina-Manzini (FM) index的方法，可以快速定位reads在基因组上的大致位置；局部索引基于哈希表的方法，可以对reads进行精确的扩展和比对。这样可以提高比对的速度和敏感性，同时节省内存空间。
+* BWT是一种线性时间复杂度的排序算法，它通过重新排列输入字符串的字符来创建一个新的字符串，这个新字符串保留了原始字符串的排序信息。
 ## 6.1 build index(.ht2)
 input:genome (.fa)<br>
 output:index (.ht2)
@@ -377,6 +381,7 @@ rm *.sam
 ls
 ```
 # 7 expression level count
+## 7.1 HTseq
 > HTseq-count:determine if the RNA reads belong to one gene(three models:union,intersection_strict,intersection_nonempty)
 
 input:align (.bam);annotation (.gff) <br>
@@ -395,6 +400,55 @@ parallel -j -4 "
 
 cd ../HTseq
 cat SRR2190795.count | head -n 10
+```
+## 7.2 StringTie
+> StringTie是一个用于转录组组装和定量的软件，它结合了有参考基因组的转录本拼接和无参考基因组的从头组装方法。
+* 首先将reads比对到参考基因组，然后根据定位的坐标信息和跨越内含子的spliced reads中反映的连接关系建立备选的拓扑图。接着，设计相应的算法在拓扑图中选择合理的转录本形成最终的转录组数据集。
+* StringTie提供了多种表达量的估计方法，包括raw count、FPKM（每百万reads的fragments每千个碱基的比率）和TPM（每百万reads的transcripts每千个碱基的比率）。
+* StringTie还提供了一个合并模式（--merge），它可以将多个样本的转录本组装结果合并成一个非冗余的转录本集合，这在处理多个RNA-Seq样本时非常有用。
+
+input:align (.bam);annotation (.gff) <br>
+output:assembly(.gtf)
+```
+cd ~/project/rat/output
+mkdir assembly
+
+cd align
+parallel -j 4 "
+  stringtie -p 4 -G ../../annotation/rn7.gff -l {1} {1}.sort.bam -o ../assembly/{1}.gtf
+" ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
+
+#merge all samples
+cd ../assembly
+ls *.gtf > mergelist.txt
+
+stringtie --merge -p 8 -G ../../annotation/rn7.gff -o merge.gtf mergelist.txt
+
+#abundance
+cd ~/project/rat/output
+mkdir abundance
+
+cd align
+parallel -j 4 "
+  mkdir ../abundance/{1}
+  stringtie -e -B -p 4 -G ../assembly/merge.gtf -l {1} {1}.sort.bam -o ../assembly/{1}/{1}.gtf
+" ::: $(ls *.sort.bam | perl -p -e 's/\.sort\.bam$//')
+
+#gffcompare
+
+#expression matrix
+cd ~/project/rat/script
+wget https://ccb.jhu.edu/software/stringtie/dl/prepDE.py
+python2 prepDE.py --help
+
+cd ~/project/rat/output/
+mkdir matrix
+
+python2 ~/project/rat/script/prepDE.py \
+   -i ./abundance \
+   -g ./matrix/gene_count_matrix.csv \
+   -t ./matrix/transcript_count_matrix.csv \
+   -l 100
 ```
 # 8 merge & normalize
 ## 8.1 merge HTseq-count results
@@ -775,6 +829,11 @@ kk <- enrichKEGG(gene = gene,
                  use_internal_data = FALSE)
 ```
 ## 12.3 GSEA
-## 12.4 DO
+GSEA针对所有基因，KEGG针对差异基因。<br>
+输入文件不是一个基因列表，而是除了基因之外还有它的表达量（目前样本中所有的非0的基因的倍数的改变的数值）。
+## 12.4 DO（Disease Ontology）
 ## 12.5 ReactomePA
-                 
+## 12.6 website
+[metascape](https://metascape.org/gp/index.html#/main/step1)
+[webgenstal](http://www.webgestalt.org/)
+[DAVID](https://david-d.ncifcrf.gov/)
