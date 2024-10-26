@@ -47,8 +47,11 @@ pip install cutadapt
 ## 2.5 quality control and trim adapter
 * Trim Galore
 ```
-wget https://github.com/FelixKrueger/TrimGalore/archive/0.6.3.tar.gz -O TrimGalore.gz
-gzip -d TrimGalore.gz
+curl -fsSL https://github.com/FelixKrueger/TrimGalore/archive/0.6.10.tar.gz -o trim_galore.tar.gz
+tar xvzf trim_galore.tar.gz
+~/biosoft/TrimGalore-0.6.10/trim_galore
+export PATH="$(pwd):PATH"
+source ~/.bashrc
 ```
 * fastp
 * trimmomatic
@@ -193,6 +196,7 @@ nohup prefetch SRR2190795 SRR224018{2..7} SRR2240228 -O . &
 ```
 * convert format(.sra > .fastq > .gz)
 ```
+mkdir srr
 array=(SRR2190795 SRR224018{2..7} SRR2240228)
 for i in "${array[@]}"; do
   dir="$HOME/project/rat/sequence/$i"
@@ -219,17 +223,17 @@ cd ~/project/rat/sequence
 mkdir ../output/fastqc
 # -o 指定输出文件夹
 # *.gz 表示这个目录下以 .gz 的所有文件
-fastqc -t 6 -o ../output/fastqc *gz
+fastqc -t 6 -o ../output/fastqc *.gz
 
 cd ~/project/rat/output/fastqc
 ls
 ```
 * multiqc
-  * per seq GC content
 ```
 multiqc .
 ```
 解读：https://www.jianshu.com/p/db2100baabb5
+  * per seq GC content
   * seq quality histograms(phred score < 30)
   * count numbers of per seq quality scores
   * adapter content
