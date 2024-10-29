@@ -124,7 +124,7 @@ wget https://bioconductor.org/packages/release/bioc/bin/windows/contrib/4.4/ball
 ### 3.1.1 genomes data(.fasta)
 * download from Ensembl
 ```
-wget https://ftp.ensembl.org/pub/release-112/fasta/rattus_norvegicus/dna/Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
+wget https://ftp.ensembl.org/pub/release-113/fasta/rattus_norvegicus/dna/Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
 ```
 * decompress
 * rename
@@ -134,7 +134,7 @@ mv Rattus_norvegicus.Rnor_7.2.dna.toplevel.fa rn7.raw.fa
 * check(chr...)
 * clear some additional text
 ```
-cat rn7.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn6.fa
+cat rn7.raw.fa | perl -ne 'if(m/^>(.+?)(?:\s|$)/){ print ">$1\n";}else{print}' > rn7.fa
 rm rn7.raw.fa
 ```
 * count per chr lengths
