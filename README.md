@@ -18,7 +18,7 @@ basic workfolw:
 download and convert data
 ```cd ~/biosoft
 wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.11.3/sratoolkit.2.11.3-win64.zip
-unzip -d sratoolkit.2.11.3-win64.zip
+unzip sratoolkit.2.11.3-win64.zip
 mv sratoolkit.2.11.3-win64 sratoolkit.2.11.3
 cd sratoolkit.2.11.3/bin
 
