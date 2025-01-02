@@ -1,5 +1,7 @@
 # RNA-seq workflow
-# 1 mkdir
+## contents
+* 
+# 1 preparation
 ```mkdir biosoft
 mkdir -p project/rat
 cd project/rat
@@ -49,7 +51,7 @@ pip install cutadapt
 ```
 curl -fsSL https://github.com/FelixKrueger/TrimGalore/archive/0.6.10.tar.gz -o trim_galore.tar.gz
 tar xvzf trim_galore.tar.gz
-~/biosoft/TrimGalore-0.6.10/trim_galore
+cd TrimGalore-0.6.10
 export PATH="$(pwd):PATH"
 source ~/.bashrc
 ```
