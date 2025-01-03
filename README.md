@@ -153,6 +153,36 @@ cat rn7.fa | perl -n -e '
   }
 '
 ```
+output:
+```
+1       260522016
+2       249053267
+3       169034231
+4       182687754
+5       166875058
+6       140994061
+7       135012528
+8       123900184
+9       114175309
+10      107211142
+11      86241447
+12      46669029
+13      106807694
+14      104886043
+15      101769107
+16      84729064
+17      86533673
+18      83828827
+19      57337602
+20      54435887
+X       152453651
+Y       18315841
+MT      16313
+MU150191.1      1794995
+MU150189.1      1402623
+MU150194.1      648519
+...
+```
 chr1:
 ```
 cat rn7.fa | perl -n -e '
@@ -179,12 +209,26 @@ gzip -d rn6_genome.tar.gz
 ### 3.1.3 annotation(.gff)
 ```
 cd ~/project/rat/annotation
-wget https://ftp.ensembl.org/pub/release-112/gff3/rattus_norvegicus/Rattus_norvegicus.mRatBN7.2.112.gff3.gz
-gzip -d Rattus_norvegicus.mRatBN7.2.112.gff3.gz
-mv Rattus_norvegicus.mRatBN7.2.112.gff3 rn7.gff
+wget https://ftp.ensembl.org/pub/release-113/gff3/rattus_norvegicus/Rattus_norvegicus.mRatBN7.2.113.gff3.gz
+gzip -d Rattus_norvegicus.mRatBN7.2.113.gff3.gz
+mv Rattus_norvegicus.mRatBN7.2.113.gff3 rn7.gff
 head rn7.gff
-```
 
+wget https://ftp.ensembl.org/pub/release-113/gtf/rattus_norvegicus/Rattus_norvegicus.mRatBN7.2.113.gtf.gz
+gzip -d Rattus_norvegicus.mRatBN7.2.113.gtf.gz
+mv Rattus_norvegicus.mRatBN7.2.113.gtf rn7.gtf
+head rn7.gtf
+```
+output(gtf):
+```
+#!genome-build mRatBN7.2
+#!genome-version mRatBN7.2
+#!genome-date 2020-11
+#!genome-build-accession GCA_015227675.2
+#!genebuild-last-updated 2022-03
+1       ensembl gene    36112690        36122387        .       -       .       gene_id "ENSRNOG00000066169"; gene_version "1"; gene_source "ensembl"; gene_biotype "protein_coding";
+1       ensembl transcript      36112690        36122387        .       -       .       gene_id "ENSRNOG00000066169"; gene_version "1"; transcript_id "ENSRNOT00000101581"; transcript_version "1"; gene_source "ensembl"; gene_biotype "protein_coding"; transcript_source "ensembl"; transcript_biotype "protein_coding"; tag "Ensembl_canonical";
+```
 ## 3.2 Experimental Data(.sra)
 cd ~/project/rat/sequence
 * NCBI-GEO >> GEO accession (GSE72960)
