@@ -1,6 +1,11 @@
 # RNA-seq workflow
 ## contents
-* 
+* [1 preparation](https://github.com/zhengxy03/RNA-seq#1-preparation)
+* [2 install tools](https://github.com/zhengxy03/RNA-seq#2-install-tools)
+* [3 data download](https://github.com/zhengxy03/RNA-seq#3-data-download)
+  * [ref data](https://github.com/zhengxy03/RNA-seq#31-ref-data)
+  * [experimental data](https://github.com/zhengxy03/RNA-seq#32-experimental-datasra)
+* [quality control](https://github.com/zhengxy03/RNA-seq#4-quality-controlfastq)
 # 1 preparation
 ```mkdir biosoft
 mkdir -p project/rat
@@ -8,14 +13,6 @@ cd project/rat
 mkdir annotation genome sequence output script
 ```
 # 2 install tools
-cd ~/biosoft
-basic workfolw:
-* download
-* decompress
-* change dir
-* config
-* make
-* export PATH
 ## 2.1 sra
 download and convert data
 ```cd ~/biosoft
@@ -127,11 +124,11 @@ wget https://bioconductor.org/packages/release/bioc/bin/windows/contrib/4.4/ball
 * download from Ensembl
 ```
 wget https://ftp.ensembl.org/pub/release-113/fasta/rattus_norvegicus/dna/Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
+gzip -d Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz
 ```
-* decompress
 * rename
 ```
-mv Rattus_norvegicus.Rnor_7.2.dna.toplevel.fa rn7.raw.fa
+mv Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa rn7.raw.fa
 ```
 * check(chr...)
 * clear some additional text
